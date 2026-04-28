@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+  --color-unid-navy: #011D44;
+  --color-unid-green: #84C340;
+  --color-unid-light: #F5F7F9;
+  
+  --font-sans: "Inter", "Pretendard", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-unid-light text-slate-900;
+  }
+}
+
+.unid-gradient {
+  background: linear-gradient(135deg, #011D44 0%, #84C340 100%);
+}
+
+.report-table th {
+  @apply bg-slate-100 p-3 text-left font-semibold border-b border-slate-200 text-sm;
+}
+
+.report-table td {
+  @apply p-3 border-b border-slate-100 align-top text-sm;
+}
+

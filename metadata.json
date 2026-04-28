@@ -1,0 +1,6 @@
+{
+  "name": "유니드 산업안전 위험성평가 지원시스템",
+  "description": "국가법령정보센터 데이터를 기반으로 협력업체 위험성 평가 초안을 생성하는 UNID 전용 지원 도구",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
