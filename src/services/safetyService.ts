@@ -15,18 +15,18 @@ export async function generateRiskAssessment(input: RiskAssessmentInput): Promis
   const apiKey = "AIzaSyD9Y6GYM1SZm5B3FJgKHxJ12jMx5Y9x6Qs";
 
 
-  const modelsToTry = ["gemini-3-flash-preview", "gemini-2.0-flash"];
+  const modelsToTry = ["gemini-3-flash-preview"]; // 파이썬 코드와 동일하게 고정
   let lastError = null;
 
   for (const modelName of modelsToTry) {
     try {
-      console.log(`Trying model: ${modelName} (with Thinking Config)...`);
+      console.log(`Calling ${modelName} with ThinkingConfig(HIGH)...`);
       const model = ai.models.generateContent({
         model: modelName,
         contents: [
           {
-            text: `당신은 대한민국 산업안전 전문가입니다. 협력업체가 입력한 정보를 바탕으로 '위험성 평가 초안'을 작성하세요.
-            (전문적인 추론 능력을 발휘하여 상세히 작성해 주세요.)
+            role: "user",
+            parts: [{ text: `당신은 대한민국 산업안전 전문가입니다. 아래 정보를 바탕으로 위험성 평가 보고서를 JSON 형식으로 작성하세요.
 
 [입력 정보]
 - 작업명: ${input.taskName}
@@ -36,25 +36,27 @@ export async function generateRiskAssessment(input: RiskAssessmentInput): Promis
 - 작업유형: ${input.taskType}
 
 [출력 형식]
-반드시 다음 JSON 구조로 응답하세요.
 {
   "department": "안전환경팀",
   "taskName": "${input.taskName}",
   "steps": [
     {
-      "step": "작업 단계 설명",
-      "riskFactors": ["위험요인 1", "위험요인 2"],
-      "measures": ["조치사항 1 (법령 제~조 근거)", "조치사항 2 (법령 제~조 근거)"]
+      "step": "단계 설명",
+      "riskFactors": ["위험요인"],
+      "measures": ["조치사항"]
     }
   ]
-}`
+}` }]
           }
         ],
         config: {
-          // @ts-ignore - 최신 SDK의 추론 기능 반영 시도
-          thinkingConfig: { includeThoughts: true },
-          tools: [{ googleSearch: {} }],
-          toolConfig: { includeServerSideToolInvocations: true },
+          // 파이썬의 thinking_config(thinking_level="HIGH")와 대응
+          // @ts-ignore
+          thinkingConfig: { 
+            includeThoughts: true,
+            // @ts-ignore
+            thinkingLevel: "HIGH" 
+          },
           responseMimeType: "application/json",
           responseSchema: {
             type: Type.OBJECT,
