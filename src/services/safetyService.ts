@@ -7,12 +7,10 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { RiskAssessmentInput, RiskAssessmentReport } from "../types";
 
 const ai = new GoogleGenAI({ 
-  apiKey: "AIzaSyD9Y6GYM1SZm5B3FJgKHxJ12jMx5Y9x6Qs" 
+  apiKey: import.meta.env.VITE_GEMINI_API_KEY || "" 
 });
 
 export async function generateRiskAssessment(input: RiskAssessmentInput): Promise<RiskAssessmentReport> {
-  // 테스트를 위해 하드코딩된 키를 사용하므로 체크 로직을 통과시킵니다.
-  const apiKey = "AIzaSyD9Y6GYM1SZm5B3FJgKHxJ12jMx5Y9x6Qs";
 
 
   const modelsToTry = ["gemini-2.5-flash-preview-04-17", "gemini-3-flash-preview", "gemini-2.0-flash"];
