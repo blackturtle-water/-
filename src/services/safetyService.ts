@@ -15,7 +15,7 @@ export async function generateRiskAssessment(input: RiskAssessmentInput): Promis
   const apiKey = "AIzaSyD9Y6GYM1SZm5B3FJgKHxJ12jMx5Y9x6Qs";
 
 
-  const modelsToTry = ["gemini-3-flash-preview"]; // 파이썬 코드와 동일하게 고정
+  const modelsToTry = ["gemini-2.5-flash-preview-04-17", "gemini-3-flash-preview", "gemini-2.0-flash"];
   let lastError = null;
 
   for (const modelName of modelsToTry) {
