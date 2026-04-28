@@ -6,7 +6,9 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { RiskAssessmentInput, RiskAssessmentReport } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+const ai = new GoogleGenAI({ 
+  apiKey: process.env.GEMINI_API_KEY || "AIzaSyD9Y6GYM1SZm5B3FJgKHxJ12jMx5Y9x6Qs" 
+});
 
 export async function generateRiskAssessment(input: RiskAssessmentInput): Promise<RiskAssessmentReport> {
   const model = ai.models.generateContent({
