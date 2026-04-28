@@ -7,15 +7,25 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { RiskAssessmentInput, RiskAssessmentReport } from "../types";
 
 const ai = new GoogleGenAI({ 
-  apiKey: process.env.GEMINI_API_KEY || "AIzaSyD9Y6GYM1SZm5B3FJgKHxJ12jMx5Y9x6Qs" 
+  apiKey: process.env.GEMINI_API_KEY || "" 
 });
 
 export async function generateRiskAssessment(input: RiskAssessmentInput): Promise<RiskAssessmentReport> {
-  const model = ai.models.generateContent({
-    model: "gemini-3-flash-preview",
-    contents: [
-      {
-        text: `당신은 대한민국 산업안전 전문가입니다. 협력업체가 입력한 정보를 바탕으로 '위험성 평가 초안'을 작성하세요.
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error("GEMINI_API_KEY가 설정되지 않았습니다. .env 파일을 확인해주세요.");
+  }
+
+  const modelsToTry = ["gemini-2.0-flash", "gemini-3.0-flash-preview"];
+  let lastError = null;
+
+  for (const modelName of modelsToTry) {
+    try {
+      console.log(`Trying model: ${modelName}...`);
+      const model = ai.models.generateContent({
+        model: modelName,
+        contents: [
+          {
+            text: `당신은 대한민국 산업안전 전문가입니다. 협력업체가 입력한 정보를 바탕으로 '위험성 평가 초안'을 작성하세요.
 
 [입력 정보]
 - 작업명: ${input.taskName}
@@ -47,36 +57,45 @@ export async function generateRiskAssessment(input: RiskAssessmentInput): Promis
     }
   ]
 }`
-      }
-    ],
-    config: {
-      tools: [{ googleSearch: {} }],
-      toolConfig: { includeServerSideToolInvocations: true },
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          department: { type: Type.STRING },
-          taskName: { type: Type.STRING },
-          steps: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                step: { type: Type.STRING },
-                riskFactors: { type: Type.ARRAY, items: { type: Type.STRING } },
-                measures: { type: Type.ARRAY, items: { type: Type.STRING } }
-              },
-              required: ["step", "riskFactors", "measures"]
-            }
           }
-        },
-        required: ["department", "taskName", "steps"]
-      }
-    }
-  });
+        ],
+        config: {
+          tools: [{ googleSearch: {} }],
+          toolConfig: { includeServerSideToolInvocations: true },
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              department: { type: Type.STRING },
+              taskName: { type: Type.STRING },
+              steps: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    step: { type: Type.STRING },
+                    riskFactors: { type: Type.ARRAY, items: { type: Type.STRING } },
+                    measures: { type: Type.ARRAY, items: { type: Type.STRING } }
+                  },
+                  required: ["step", "riskFactors", "measures"]
+                }
+              }
+            },
+            required: ["department", "taskName", "steps"]
+          }
+        }
+      });
 
-  const response = await model;
-  const result = JSON.parse(response.text || "{}");
-  return result as RiskAssessmentReport;
+      const response = await model;
+      const result = JSON.parse(response.text || "{}");
+      console.log(`Successfully generated using ${modelName}`);
+      return result as RiskAssessmentReport;
+    } catch (error) {
+      console.error(`${modelName} failed:`, error);
+      lastError = error;
+      // 다음 모델로 계속 진행
+    }
+  }
+
+  throw new Error(`모든 AI 모델 호출에 실패했습니다. 마지막 오류: ${lastError?.toString()}`);
 }
