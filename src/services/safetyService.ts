@@ -7,12 +7,12 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { RiskAssessmentInput, RiskAssessmentReport } from "../types";
 
 const ai = new GoogleGenAI({ 
-  apiKey: process.env.GEMINI_API_KEY || "" 
+  apiKey: import.meta.env.VITE_GEMINI_API_KEY || "" 
 });
 
 export async function generateRiskAssessment(input: RiskAssessmentInput): Promise<RiskAssessmentReport> {
-  if (!process.env.GEMINI_API_KEY) {
-    throw new Error("GEMINI_API_KEY가 설정되지 않았습니다. .env 파일을 확인해주세요.");
+  if (!import.meta.env.VITE_GEMINI_API_KEY) {
+    throw new Error("VITE_GEMINI_API_KEY가 설정되지 않았습니다. .env 파일을 확인해주세요.");
   }
 
   const modelsToTry = ["gemini-2.0-flash", "gemini-3.0-flash-preview"];
